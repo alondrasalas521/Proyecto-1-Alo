@@ -1,0 +1,47 @@
+to mandala 
+  create-turtles 8 
+  ask turtle 2 [  setxy -6 1 set heading 45 pendown repeat 2[ repeat 20 [ fd 5 right 46 ] ]]
+  ask turtle 3 [ 
+		setxy -3 -4 
+		set heading 90 
+		pendown  
+    repeat	100 [fd 5 repeat 10 [ fd 1 right 30 ] ]
+    ask turtle 4 [ 
+      setxy 9 -5 
+      set heading 45 
+      pendown
+      repeat 5 [
+      repeat 5 [
+      fd 9
+      rt 170
+    ]
+    rt 10
+  ]
+]
+]
+  ask turtle 5 [
+		setxy -3 -8 
+		set heading 90 
+		pendown  
+    repeat	100 [fd 5 repeat 8 [ fd 1 right 45 ] ]
+    ]
+    ask turtle 6 [
+		setxy -3 8 
+		set heading 90 
+		pendown  
+    repeat	100 [fd 5 repeat 8 [ fd 1 right 45 ] ]
+    ]
+      ask turtle 7 [ 
+      setxy -15 -5 
+      set heading 45 
+      pendown
+      repeat 5 [
+      repeat 5 [
+      fd 9
+      rt 170
+    ]
+    rt 10
+  ]
+]
+
+end 
