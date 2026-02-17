@@ -1,0 +1,36 @@
+to setup
+  clear-all
+  create-turtles 4 
+end
+
+to escribir_nombre
+ 	ask turtle 0 [  
+		setxy -10 0  
+		set heading 30 
+		pendown 
+		fd 5 
+		right 120 
+		fd 5 
+	] 
+	ask turtle 1 [ 
+		setxy -8 3 
+		set heading 90 
+		pendown 
+		fd 3 ] 
+	ask turtle 2 [ 
+		setxy -2 0 
+		set heading 0 
+
+		pendown fd 5 
+		right 180 
+		fd 5 
+		lt 90 
+		fd 3
+	 ]  
+	ask turtle 3 [ 
+		setxy 4 4 
+		set heading 90 
+		pendown  
+		repeat 20 [ fd 1 right 30 ] 
+]
+end 
