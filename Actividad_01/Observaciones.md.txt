@@ -1,0 +1,24 @@
+Observaciones
+
+Diferentes preferencias
+
+Cuando ambos grupos mantienen niveles de intolerancia por debajo del 25%, la población tiende a permanecer relativamente diversa. En estos casos, el sistema alcanza estados estables sin una segregación espacial marcada. Sin embargo, conforme aumentamos la intolerancia, comienzan a aparecer patrones de segregación.
+
+Cuando ambos grupos son 100% intolerantes, la densidad juega un papel crucial. En estos casos, es necesario que la densidad sea estrictamente menor a 20% para que todos los agentes encuentren una ubicación donde sean felices. En densidades altas, simplemente no hay suficiente espacio para que cada individuo tenga exclusivamente vecinos de su mismo grupo. El sistema queda bloqueado y aparecen agentes permanentemente infelices.
+
+Cuando un grupo tiene 0% de intolerancia (es decir, es completamente tolerante), parecería que eso debería facilitar la felicidad global. Sin embargo, no ocurre así. Los agentes completamente tolerantes no se mueven y permanecen satisfechos independientemente de su entorno. Pero si el otro grupo tiene una intolerancia superior al 12%, siempre existirán agentes intolerantes que no podrán encontrar una posición adecuada.
+
+Curiosamente, al aumentar ligeramente la intolerancia del grupo completamente tolerante, el sistema mejora: ambos grupos se redistribuyen y eventualmente todos pueden alcanzar la felicidad. Esto produce pequeñas segregaciones, pero permite una configuración estable.
+
+Cuando ambos grupos superan niveles de intolerancia del 75%, el sistema se vuelve altamente inestable. Solo por breves momentos algunos individuos alcanzan la felicidad, pero no se logra una configuración estable duradera.
+
+
+Múltiples grupos
+
+A partir del cuarto grupo, especialmente con densidades altas e intolerancia mayor al 50%, el sistema se vuelve notablemente inestable. Los agentes tienen mayores dificultades para encontrar configuraciones satisfactorias. Entre mayor es el número de grupos mayor debe ser la tolerancia promedio para mantener diversidad y mayor es la competencia por espacio compatible.
+
+En general, cuando la intolerancia se mantiene por debajo del 15%, la ciudad conserva diversidad espacial. Al superar ese valor, comienzan a formarse pequeños núcleos segregados que pueden crecer conforme aumenta la intolerancia.
+
+Con densidades bajas es más fácil que los agentes encuentren posiciones satisfactorias y el sistema converge más rápido.
+
+Con densidades altas se reduce la movilidad efectiva, aparecen bloqueos estructurales, la convergencia se vuelve más lenta o imposible, y además, conforme aumenta el número de grupos, la densidad máxima compatible con felicidad global debe disminuir.
