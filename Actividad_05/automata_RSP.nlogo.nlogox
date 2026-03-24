@@ -1,128 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <model version="NetLogo 7.0.1" snapToGrid="true">
-  <code><![CDATA[turtles-own [
-  estrategia
-  estrategia_siguiente
-  pago
-]
-
-globals [
-  matriz_pagos
-  num_estrategias
-  num_jugadores
-  colores
+  <code><![CDATA[ patches-own [
+  estado
+  estado-siguiente
 ]
 
 to setup
   clear-all
-  init_pagos
-  init_jugadores
-  init_grafica
-  colorear_jugadores
+  ask patches [
+    set estado one-of ["rojo" "azul" "amarillo"]
+    set estado-siguiente estado
+    recolorear
+  ]
   reset-ticks
-  actualizar_grafica
 end
 
-to init_pagos
-  set matriz_pagos read-from-string pagos
-  set num_estrategias length matriz_pagos
-  set colores map [ k -> 15 + 30 * k] (range num_estrategias)
-end
-
-to init_jugadores 
-  let distribucion_inicial read-from-string num_jugadores_por_estrategia
-  if length distribucion_inicial != length matriz_pagos [
-    user-message "El numero de elementos de num_jugadores_por_estrategia debe ser igual al numero de filas de la matriz de pagos"
-  ]
-  let i 0 
-  foreach distribucion_inicial [
-    j -> 
-    create-turtles j [
-      setxy random-xcor random-ycor
-      set shape "circle"
-      set size 0.75
-      set estrategia i
-      set estrategia_siguiente estrategia
-      set pago 0
-    ]
-    set i i + 1
-  ]
-  set num_jugadores count turtles
-end
-
-to init_grafica
-  set-current-plot "Frecuencia estrategias"
-  foreach (range num_estrategias) [
-    i ->
-    create-temporary-plot-pen (word i)
-    set-plot-pen-color item i colores 
-  ]
-end
-
-to colorear_jugadores
-  ask turtles [
-    set color item estrategia colores 
-  ]
-
-end
-  
 to go
-  ask turtles [ jugar ]
-  ask turtles [
-    if (random-float 1 < prob_cambio) [
-      cambiar_estrategia
-    ]  
-  ]
-  ask turtles [
-    set estrategia estrategia_siguiente 
-  ]
-  colorear_jugadores
+  calcular-siguiente-estado
+  actualizar-estados
   tick
-  actualizar_grafica
-end 
-
-to jugar 
-  let otro_jugador one-of other turtles
-  set pago item ( [ estrategia ] of otro_jugador) (item estrategia matriz_pagos)
- 
 end
 
-to cambiar_estrategia
-  ifelse random-float 1 < ruido [
-    set estrategia_siguiente (random num_estrategias)
-  ][
-  let jugador_observado one-of other turtles
-  if [pago] of jugador_observado > pago [
-    set estrategia_siguiente [estrategia] of jugador_observado
+to calcular-siguiente-estado
+  ask patches [
+    let n-rojos count neighbors with [estado = "rojo"]
+    let n-azules count neighbors with [estado = "azul"]
+    let n-amarillos count neighbors with [estado = "amarillo"]
+
+    ; ciclo intransitivo:
+    ; rojo le gana a azul
+    ; azul le gana a amarillo
+    ; amarillo le gana a rojo
+
+    if estado = "azul" [
+      ifelse n-rojos >= criterio [
+        set estado-siguiente "rojo"
+      ] [
+        set estado-siguiente "azul"
+      ]
+    ]
+
+    if estado = "amarillo" [
+      ifelse n-azules >= criterio [
+        set estado-siguiente "azul"
+      ] [
+        set estado-siguiente "amarillo"
+      ]
+    ]
+
+    if estado = "rojo" [
+      ifelse n-amarillos >= criterio [
+        set estado-siguiente "amarillo"
+      ] [
+        set estado-siguiente "rojo"
+      ]
     ]
   ]
 end
 
-to actualizar_grafica
-  let nums_estrategias (range num_estrategias)
-  let frec_estrategias map [n -> 
-    (count turtles with [estrategia = n])/(count turtles )
-  ] nums_estrategias
-  set-current-plot "Frecuencia estrategias"
-  foreach nums_estrategias [ n ->
-    set-current-plot-pen (word n)
-    plotxy ticks (item n frec_estrategias)
-    set-plot-y-range 0 1 ]
-  
+to actualizar-estados
+  ask patches [
+    set estado estado-siguiente
+    recolorear
+  ]
+end
+
+to recolorear
+  if estado = "rojo" [ set pcolor red ]
+  if estado = "azul" [ set pcolor blue ]
+  if estado = "amarillo" [ set pcolor yellow ]
 end]]></code>
   <widgets>
-    <view x="368" wrappingAllowedX="true" y="10" frameRate="30.0" minPycor="-16" height="434" showTickCounter="true" patchSize="13.0" fontSize="10" wrappingAllowedY="true" width="434" tickCounterLabel="ticks" maxPycor="16" updateMode="1" maxPxcor="16" minPxcor="-16"></view>
-    <button x="130" y="60" height="40" disableUntilTicks="false" forever="false" kind="Observer" width="55">setup</button>
-    <input x="35" multiline="false" y="260" height="60" variable="num_jugadores_por_estrategia" type="reporter" width="250">[500 500]</input>
-    <slider x="40" step="0.01" y="325" max="1" width="250" display="prob_cambio" height="50" min="0" direction="Horizontal" default="0.16" variable="prob_cambio"></slider>
-    <slider x="40" step="0.01" y="385" max="1" width="250" display="ruido" height="50" min="0" direction="Horizontal" default="0.0" variable="ruido"></slider>
-    <plot x="870" autoPlotX="true" yMax="10.0" autoPlotY="true" y="60" xMin="0.0" height="175" legend="true" xMax="10.0" yMin="0.0" width="230" display="Frecuencia estrategias">
-      <setup></setup>
-      <update></update>
-    </plot>
-    <button x="195" y="60" height="40" disableUntilTicks="false" forever="true" kind="Observer" width="55">go</button>
-    <input x="40" multiline="true" y="100" height="155" variable="pagos" type="reporter" width="250">[[-1 4]
-  [0 2]]</input>
+    <view x="368" wrappingAllowedX="true" y="10" frameRate="30.0" minPycor="-16" height="434" showTickCounter="true" patchSize="13.0" fontSize="10" wrappingAllowedY="true" width="434" tickCounterLabel="ticks" maxPycor="16" updateMode="0" maxPxcor="16" minPxcor="-16"></view>
+    <slider x="50" step="1" y="185" max="8" width="250" display="criterio" height="50" min="1" direction="Horizontal" default="2.0" variable="criterio"></slider>
+    <button x="120" y="40" height="40" disableUntilTicks="false" forever="false" kind="Observer" width="55">setup
+</button>
+    <button x="110" y="95" height="40" disableUntilTicks="false" forever="true" kind="Observer" width="55">go
+</button>
   </widgets>
   <info>## WHAT IS IT?
 

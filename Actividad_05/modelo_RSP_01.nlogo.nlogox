@@ -1,128 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <model version="NetLogo 7.0.1" snapToGrid="true">
-  <code><![CDATA[turtles-own [
-  estrategia
-  estrategia_siguiente
-  pago
-]
-
-globals [
-  matriz_pagos
-  num_estrategias
-  num_jugadores
-  colores
-]
-
-to setup
-  clear-all
-  init_pagos
-  init_jugadores
-  init_grafica
-  colorear_jugadores
+  <code><![CDATA[to setup 
+  clear-all 
+  
+  ask patches [
+    set pcolor one-of [red yellow blue]
+    
+  ]
+  
   reset-ticks
-  actualizar_grafica
-end
-
-to init_pagos
-  set matriz_pagos read-from-string pagos
-  set num_estrategias length matriz_pagos
-  set colores map [ k -> 15 + 30 * k] (range num_estrategias)
-end
-
-to init_jugadores 
-  let distribucion_inicial read-from-string num_jugadores_por_estrategia
-  if length distribucion_inicial != length matriz_pagos [
-    user-message "El numero de elementos de num_jugadores_por_estrategia debe ser igual al numero de filas de la matriz de pagos"
-  ]
-  let i 0 
-  foreach distribucion_inicial [
-    j -> 
-    create-turtles j [
-      setxy random-xcor random-ycor
-      set shape "circle"
-      set size 0.75
-      set estrategia i
-      set estrategia_siguiente estrategia
-      set pago 0
-    ]
-    set i i + 1
-  ]
-  set num_jugadores count turtles
-end
-
-to init_grafica
-  set-current-plot "Frecuencia estrategias"
-  foreach (range num_estrategias) [
-    i ->
-    create-temporary-plot-pen (word i)
-    set-plot-pen-color item i colores 
-  ]
-end
-
-to colorear_jugadores
-  ask turtles [
-    set color item estrategia colores 
-  ]
-
-end
   
-to go
-  ask turtles [ jugar ]
-  ask turtles [
-    if (random-float 1 < prob_cambio) [
-      cambiar_estrategia
-    ]  
-  ]
-  ask turtles [
-    set estrategia estrategia_siguiente 
-  ]
-  colorear_jugadores
-  tick
-  actualizar_grafica
-end 
-
-to jugar 
-  let otro_jugador one-of other turtles
-  set pago item ( [ estrategia ] of otro_jugador) (item estrategia matriz_pagos)
- 
 end
 
-to cambiar_estrategia
-  ifelse random-float 1 < ruido [
-    set estrategia_siguiente (random num_estrategias)
-  ][
-  let jugador_observado one-of other turtles
-  if [pago] of jugador_observado > pago [
-    set estrategia_siguiente [estrategia] of jugador_observado
+to go 
+  ;elegir una celda al azar
+  ask one-of patches [
+    ;elegir al competidor
+    let mi_competidor one-of patches
+    
+    if tipo_interaccion = "local" [
+       set mi_competidor one-of neighbors
     ]
+    
+    ;revisar si le gano a mi competidor
+    
+    ifelse le_gano? mi_competidor [
+      ; si le gano, entonces lo invado
+      ask mi_competidor [set pcolor [pcolor] of myself ]
+    ][
+      ;revisar si mi competidor me gana
+      if [le_gano? myself] of mi_competidor[
+        ;si si me gana,entonces me invade
+        set pcolor [pcolor] of mi_competidor
+      ]
+    ]
+  
   ]
+  tick 
 end
 
-to actualizar_grafica
-  let nums_estrategias (range num_estrategias)
-  let frec_estrategias map [n -> 
-    (count turtles with [estrategia = n])/(count turtles )
-  ] nums_estrategias
-  set-current-plot "Frecuencia estrategias"
-  foreach nums_estrategias [ n ->
-    set-current-plot-pen (word n)
-    plotxy ticks (item n frec_estrategias)
-    set-plot-y-range 0 1 ]
-  
+to-report le_gano? [ el_otro ]
+ (ifelse 
+    pcolor = red and [pcolor] of el_otro = blue and random-float 1.0 > p_r [report true]
+    ;pcolor = red and ([pcolor] of el_otro = blue or [pcolor] of el_otro = yellow ) and random-float 1.0 > p_r [report true]
+    pcolor = blue and [pcolor] of el_otro = yellow  and random-float 1.0 > p_b [report true]
+    pcolor = yellow and [pcolor] of el_otro = red  and random-float 1.0 > p_y [report true]
+   [report false])
 end]]></code>
   <widgets>
-    <view x="368" wrappingAllowedX="true" y="10" frameRate="30.0" minPycor="-16" height="434" showTickCounter="true" patchSize="13.0" fontSize="10" wrappingAllowedY="true" width="434" tickCounterLabel="ticks" maxPycor="16" updateMode="1" maxPxcor="16" minPxcor="-16"></view>
-    <button x="130" y="60" height="40" disableUntilTicks="false" forever="false" kind="Observer" width="55">setup</button>
-    <input x="35" multiline="false" y="260" height="60" variable="num_jugadores_por_estrategia" type="reporter" width="250">[500 500]</input>
-    <slider x="40" step="0.01" y="325" max="1" width="250" display="prob_cambio" height="50" min="0" direction="Horizontal" default="0.16" variable="prob_cambio"></slider>
-    <slider x="40" step="0.01" y="385" max="1" width="250" display="ruido" height="50" min="0" direction="Horizontal" default="0.0" variable="ruido"></slider>
-    <plot x="870" autoPlotX="true" yMax="10.0" autoPlotY="true" y="60" xMin="0.0" height="175" legend="true" xMax="10.0" yMin="0.0" width="230" display="Frecuencia estrategias">
+    <view x="368" wrappingAllowedX="true" y="10" frameRate="30.0" minPycor="-16" height="434" showTickCounter="true" patchSize="13.0" fontSize="10" wrappingAllowedY="true" width="434" tickCounterLabel="ticks" maxPycor="16" updateMode="0" maxPxcor="16" minPxcor="-16"></view>
+    <button x="135" y="90" height="40" disableUntilTicks="false" forever="false" kind="Observer" width="55">setup</button>
+    <button x="120" y="135" height="40" disableUntilTicks="false" forever="true" kind="Observer" width="55">go</button>
+    <slider x="40" step="0.01" y="180" max="1" width="250" display="p_r" height="50" min="0" direction="Horizontal" default="0.37" variable="p_r"></slider>
+    <slider x="30" step="0.01" y="245" max="1" width="250" display="p_b" height="50" min="0" direction="Horizontal" default="0.38" variable="p_b"></slider>
+    <slider x="20" step="0.01" y="310" max="1" width="250" display="p_y" height="50" min="0" direction="Horizontal" default="0.56" variable="p_y"></slider>
+    <plot x="845" autoPlotX="true" yMax="10.0" autoPlotY="true" yAxis="N" y="140" xMin="0.0" height="175" legend="false" xMax="10.0" yMin="0.0" width="230" xAxis="tiempo" display="poblaciones">
       <setup></setup>
       <update></update>
+      <pen interval="1.0" mode="0" display="default" color="-2674135" legend="true">
+        <setup></setup>
+        <update>plot count patches with [ pcolor = red ]</update>
+      </pen>
+      <pen interval="1.0" mode="0" display="pen-1" color="-13345367" legend="true">
+        <setup></setup>
+        <update>plot count patches with [ pcolor = blue ]</update>
+      </pen>
+      <pen interval="1.0" mode="0" display="pen-2" color="-1184463" legend="true">
+        <setup></setup>
+        <update>plot count patches with [ pcolor = yellow ]</update>
+      </pen>
     </plot>
-    <button x="195" y="60" height="40" disableUntilTicks="false" forever="true" kind="Observer" width="55">go</button>
-    <input x="40" multiline="true" y="100" height="155" variable="pagos" type="reporter" width="250">[[-1 4]
-  [0 2]]</input>
+    <chooser x="70" y="395" height="60" variable="tipo_interaccion" current="1" width="250" display="tipo_interaccion">
+      <choice type="string" value="global"></choice>
+      <choice type="string" value="local"></choice>
+    </chooser>
   </widgets>
   <info>## WHAT IS IT?
 
